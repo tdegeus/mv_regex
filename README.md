@@ -2,42 +2,75 @@
 
 Move files by applying an regular expression. This allows one to partly rename a batch of files.
 
-## Installation
+>   **Disclaimer**
+>   
+>   This library is free to use under the [MIT license](https://github.com/tdegeus/mv_regex/blob/master/LICENSE). Any additions are very much appreciated, in terms of suggested functionality, code, documentation, testimonials, word-of-mouth advertisement, etc. Bug reports or feature requests can be filed on [GitHub](https://github.com/tdegeus/mv_regex). As always, the code comes with no guarantee. None of the developers can be held responsible for possible mistakes.
+>   
+>   Download: [.zip file](https://github.com/tdegeus/mv_regex/zipball/master) | [.tar.gz file](https://github.com/tdegeus/mv_regex/tarball/master).
+>   
+>   (c - [MIT](https://github.com/tdegeus/mv_regex/blob/master/LICENSE)) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | [github.com/tdegeus/mv_regex](https://github.com/tdegeus/mv_regex)
 
-To get these scripts to work one can:
+# Contents
 
--   Point the `$PATH` to this repository's location, for example by adding the following line to the `~/.bashrc` (or `~/.zshrc`):
-  
-    ```bash
-    export PATH=/path/to/bash_ext:$PATH
-    ```
+<!-- MarkdownTOC -->
 
--   'Install' the script:
-  
-    1.  'Install' the scripts:
-  
-        ```bash
-        cd /path/to/bash_ext
-        mkdir build
-        cd build
-        cmake .. 
-        make install
-        ```
-     
--   'Install' the script in your home folder:
-  
-    1.  Create a directory to store libraries in the home-folder. For example:
-  
-        ```bash
-        mkdir ~/opt
-        ```
+- [Getting mv_regex](#getting-mv_regex)
+    - [Using conda](#using-conda)
+    - [Using PyPi](#using-pypi)
+    - [From source](#from-source)
+- [Usage](#usage)
 
-    2.  'Install' the bash_ext's scripts. For example:
-  
-        ```bash
-        cd /path/to/bash_ext
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX:PATH=$HOME/opt
-        make install
-        ```
+<!-- /MarkdownTOC -->
+
+# Getting mv_regex
+
+## Using conda
+
+```bash
+conda install -c conda-forge mv_regex
+```
+
+## Using PyPi
+
+```bash
+pip install mv_regex
+```
+
+## From source
+
+```bash
+# Download mv_regex
+git checkout https://github.com/tdegeus/mv_regex.git
+cd mv_regex
+
+# Install
+python -m pip install .
+```
+
+# Usage
+
+The usage is as follows (see `mv_regex --help`):
+
+```bash
+mv_regex
+  Rename files using regular expressions. The program will prompt the user for
+  confirmation before renaming (unless the "--force" options is used).
+
+Usage:
+  mv_regex [options] <search> <replace> <files>...
+
+Arguments:
+  <search>        Regular expression to search.
+  <replace>       Regular expression to use as replace.
+  <files>         List of files on which to do the replacement.
+
+Options:
+  -f, --force     Force move, don\'t prompt for user interaction.
+  -d, --dirname   Rename directory name (not the file-name).
+  -h, --help      Show help.
+      --version   Show version.
+
+
+Example:
+  mv_regex "(.*)(_raw.svg)" "\1.svg" *.svg
+```
