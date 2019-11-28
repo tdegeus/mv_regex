@@ -31,9 +31,8 @@ import os
 import re
 import docopt
 import click
-import pkg_resources
 
-__version__ = pkg_resources.require("mv_regex")[0].version
+__version__ = '0.0.2'
 
 # --------------------------------------------------------------------------------------------------
 
