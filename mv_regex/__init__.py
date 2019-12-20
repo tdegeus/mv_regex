@@ -26,13 +26,13 @@ Copyright:
   www.geus.me
 """
 
+__version__ = '0.1.0'
+
 import sys
 import os
 import re
 import docopt
 import click
-
-__version__ = '0.0.2'
 
 # --------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ def main():
   # check if all input files actually exist
   for file in args['<files>']:
     if not os.path.isfile(file) and not os.path.isdir(file):
-      print('Input {1:s} does not exist'.format(file))
+      print('Input {0:s} does not exist'.format(file))
       sys.exit(1)
 
   # select directory name
