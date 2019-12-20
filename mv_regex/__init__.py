@@ -26,13 +26,13 @@ Copyright:
   www.geus.me
 """
 
+__version__ = '0.1.0'
+
 import sys
 import os
 import re
 import docopt
 import click
-
-__version__ = '0.0.2'
 
 # --------------------------------------------------------------------------------------------------
 
