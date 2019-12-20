@@ -1,12 +1,6 @@
 
 import subprocess
 import os
-import sys
-
-if sys.platform.startswith('win'):
-    command = 'mv-regex'
-else:
-    command = 'mv_regex'
 
 # support function
 # ----------------
@@ -20,7 +14,7 @@ def run(cmd):
 open('test1_foo.log', 'w').write('foo')
 open('test1_bar.log', 'w').write('bar')
 
-run(command + r' -f "(.*)(\.log)" "\1\2.bak" *')
+run(r'mv_regex -f "(.*)(\.log)" "\1\2.bak" *')
 
 assert not os.path.isfile('test1_foo.log')
 assert not os.path.isfile('test1_bar.log')
