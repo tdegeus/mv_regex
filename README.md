@@ -1,26 +1,30 @@
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/mv_regex.svg)](https://anaconda.org/conda-forge/mv_regex)
+
 # mv_regex
 
 Move files by applying an regular expression. This allows one to partly rename a batch of files.
-
->   **Disclaimer**
->   
->   This library is free to use under the [MIT license](https://github.com/tdegeus/mv_regex/blob/master/LICENSE). Any additions are very much appreciated, in terms of suggested functionality, code, documentation, testimonials, word-of-mouth advertisement, etc. Bug reports or feature requests can be filed on [GitHub](https://github.com/tdegeus/mv_regex). As always, the code comes with no guarantee. None of the developers can be held responsible for possible mistakes.
->   
->   Download: [.zip file](https://github.com/tdegeus/mv_regex/zipball/master) | [.tar.gz file](https://github.com/tdegeus/mv_regex/tarball/master).
->   
->   (c - [MIT](https://github.com/tdegeus/mv_regex/blob/master/LICENSE)) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | [github.com/tdegeus/mv_regex](https://github.com/tdegeus/mv_regex)
 
 # Contents
 
 <!-- MarkdownTOC -->
 
+- [Disclaimer](#disclaimer)
 - [Getting mv_regex](#getting-mv_regex)
-    - [Using conda](#using-conda)
-    - [Using PyPi](#using-pypi)
-    - [From source](#from-source)
+  - [Using conda](#using-conda)
+  - [Using PyPi](#using-pypi)
+  - [From source](#from-source)
 - [Usage](#usage)
 
 <!-- /MarkdownTOC -->
+
+# Disclaimer
+
+This library is free to use under the [MIT license](https://github.com/tdegeus/mv_regex/blob/master/LICENSE). Any additions are very much appreciated, in terms of suggested functionality, code, documentation, testimonials, word-of-mouth advertisement, etc. Bug reports or feature requests can be filed on [GitHub](https://github.com/tdegeus/mv_regex). As always, the code comes with no guarantee. None of the developers can be held responsible for possible mistakes.
+
+Download: [.zip file](https://github.com/tdegeus/mv_regex/zipball/master) | [.tar.gz file](https://github.com/tdegeus/mv_regex/tarball/master).
+
+(c - [MIT](https://github.com/tdegeus/mv_regex/blob/master/LICENSE)) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | [github.com/tdegeus/mv_regex](https://github.com/tdegeus/mv_regex)
+
 
 # Getting mv_regex
 
@@ -51,7 +55,7 @@ python -m pip install .
 
 The usage is as follows (see `mv_regex --help`):
 
-```bash
+```
 mv_regex
   Rename files using regular expressions. The program will prompt the user for
   confirmation before renaming (unless the "--force" options is used).
