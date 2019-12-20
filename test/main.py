@@ -6,7 +6,7 @@ import os
 # ----------------
 
 def run(cmd):
-    subprocess.check_output(cmd,shell=True).decode('utf-8').split('\n')
+    subprocess.check_output(cmd,shell=True).decode('utf-8')
 
 # run test
 # --------
