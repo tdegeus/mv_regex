@@ -1,3 +1,5 @@
+
+[![Travis](https://travis-ci.org/tdegeus/mv_regex.svg?branch=master)](https://travis-ci.org/tdegeus/mv_regex)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/mv_regex.svg)](https://anaconda.org/conda-forge/mv_regex)
 
 # mv_regex
