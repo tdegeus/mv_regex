@@ -46,12 +46,6 @@ def main():
             print('Input {0:s} does not exist'.format(file))
             sys.exit(1)
 
-    # TODO: catch non-recursive limitation
-    for file in args['<files>']:
-        if os.path.isdir(file):
-            print('TODO: Current implementation non-recursive, please file a bug-report on GitHub')
-            sys.exit(1)
-
     # only keep input files that match the input regular-expression (gains speed)
     args['<files>'] = [file
         for file in args['<files>'] if re.match(args['<search>'], file)]
@@ -68,6 +62,12 @@ def main():
     # no files remaining -> quit
     if len(args['renamed']) == 0:
         sys.exit(0)
+
+    # TODO: catch non-recursive limitation
+    for file in args['<files>']:
+        if os.path.isdir(file):
+            print('TODO: Current implementation non-recursive, please file a bug-report on GitHub')
+            sys.exit(1)
 
     # check file existence
     for file in args['renamed']:
