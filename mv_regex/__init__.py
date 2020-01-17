@@ -12,7 +12,7 @@ Arguments:
 
 Options:
   -f, --force     Force move, don't prompt for user interaction.
-  -d, --dirname   Rename directory name (not the file-name).
+  -n, --dry-run   Perform a trial run with no changes made.
   -h, --help      Show help.
       --version   Show version.
 
@@ -26,7 +26,7 @@ Copyright:
   www.geus.me
 """
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 import sys
 import os
@@ -38,48 +38,63 @@ import click
 
 def main():
 
-  args = docopt.docopt(__doc__, version=__version__)
+    args = docopt.docopt(__doc__, version=__version__)
 
-  # check if all input files actually exist
-  for file in args['<files>']:
-    if not os.path.isfile(file) and not os.path.isdir(file):
-      print('Input {0:s} does not exist'.format(file))
-      sys.exit(1)
+    # check that all input files exist
+    for file in args['<files>']:
+        if not os.path.isfile(file) and not os.path.isdir(file):
+            print('Input {0:s} does not exist'.format(file))
+            sys.exit(1)
 
-  # select directory name
-  if args['--dirname']: args['<files>'] = [os.path.split(file)[0] for file in args['<files>']]
+    # TODO: catch non-recursive limitation
+    for file in args['<files>']:
+        if os.path.isdir(file):
+            print('TODO: Current implementation non-recursive, please file a bug-report on GitHub')
+            sys.exit(1)
 
-  # only keep input files that match the input regular-expression
-  args['<files>'] = [file for file in args['<files>'] if re.match(args['<search>'],file)]
+    # only keep input files that match the input regular-expression (gains speed)
+    args['<files>'] = [file
+        for file in args['<files>'] if re.match(args['<search>'], file)]
 
-  # rename the remaining files
-  args['renamed'] = [re.sub(args['<search>'],args['<replace>'],file) for file in args['<files>']]
+    # rename files according to input
+    args['renamed'] = [re.sub(args['<search>'], args['<replace>'], file)
+        for file in args['<files>']]
 
-  # only keep files that will be renamed
-  idx = [i for i,(old,new) in enumerate(zip(args['<files>'], args['renamed'])) if old != new]
-  args['<files>'] = [args['<files>'][i] for i in idx]
-  args['renamed'] = [args['renamed'][i] for i in idx]
+    # only keep files that will be renamed
+    idx = [i for i, (old, new) in enumerate(zip(args['<files>'], args['renamed'])) if old != new]
+    args['<files>'] = [args['<files>'][i] for i in idx]
+    args['renamed'] = [args['renamed'][i] for i in idx]
 
-  # no files remaining -> quit
-  if len(args['renamed']) == 0:
-    sys.exit(0)
+    # no files remaining -> quit
+    if len(args['renamed']) == 0:
+        sys.exit(0)
 
-  # prompt the user for confirmation
-  if not args['--force']:
+    # check file existence
+    for file in args['renamed']:
+        if os.path.isdir(file):
+            print('Output "{0:s}" already exists, aborting"'.format(file))
+            sys.exit(1)
 
-    # - construct print-format to align output
-    w   = max([len(file) for file in args['<files>']])
-    fmt = 'mv {file:'+str(w)+'s} {new:s}'
+    # prompt the user for confirmation
+    if not args['--force']:
 
-    # - print all files
-    for file,new in zip(args['<files>'],args['renamed']):
-      print(fmt.format(file=file,new=new))
+        # construct print-format to align output
+        w = max([len(file) for file in args['<files>']])
+        fmt = 'mv {file:'+str(w)+'s} {new:s}'
 
-    # - prompt user
-    if not click.confirm('Proceed?'):
-      sys.exit(1)
+        # print all files
+        for file,new in zip(args['<files>'],args['renamed']):
+            print(fmt.format(file=file,new=new))
 
-  # proceed with the renaming of all files
-  for file,new in zip(args['<files>'],args['renamed']):
-    os.rename(file,new)
+        # quit if needed
+        if args['--dry-run']:
+            sys.exit(0)
+
+        # prompt user
+        if not click.confirm('Proceed?'):
+            sys.exit(1)
+
+    # rename files
+    for file, new in zip(args['<files>'], args['renamed']):
+        os.rename(file, new)
 
