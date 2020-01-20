@@ -1,29 +1,25 @@
-"""mv_regex
-  Rename files using regular expressions. The program will prompt the user for
-  confirmation before renaming (unless the "--force" options is used).
+r"""mv_regex
+    Rename files using regular expressions. The program will prompt the user for
+    confirmation before renaming (unless the "--force" options is used).
 
 Usage:
-  mv_regex [options] <search> <replace> <files>...
+    mv_regex [options] <search> <replace> <files>...
 
 Arguments:
-  <search>        Regular expression to search.
-  <replace>       Regular expression to use as replace.
-  <files>         List of files on which to do the replacement.
+    <search>        Regular expression to search.
+    <replace>       Regular expression to use as replace.
+    <files>         List of files on which to do the replacement.
 
 Options:
-  -f, --force     Force move, don't prompt for user interaction.
-  -n, --dry-run   Perform a trial run with no changes made.
-  -h, --help      Show help.
-      --version   Show version.
-
+    -f, --force     Force move, don't prompt for user interaction.
+    -n, --dry-run   Perform a trial run with no changes made.
+    -h, --help      Show help.
+        --version   Show version.
 
 Example:
-  mv_regex "(.*)(_raw.svg)" "\1.svg" *.svg
+    mv_regex "(.*)(_raw.svg)" "\1.svg" *.svg
 
-Copyright:
-  T.W.J. de Geus
-  tom@geus.me
-  www.geus.me
+(c - MIT) T.W.J. de Geus | tom@geus.me | www.geus.me | github.com/tdegeus/mv_regex
 """
 
 __version__ = '0.2.0'
@@ -63,13 +59,13 @@ def main():
     if len(args['renamed']) == 0:
         sys.exit(0)
 
-    # TODO: catch non-recursive limitation
+    # catch non-recursive limitation
     for file in args['<files>']:
         if os.path.isdir(file):
             print('TODO: Current implementation non-recursive, please file a bug-report on GitHub')
             sys.exit(1)
 
-    # check file existence
+    # avoid file overwrite
     for file in args['renamed']:
         if os.path.isdir(file):
             print('Output "{0:s}" already exists, aborting"'.format(file))
@@ -78,19 +74,14 @@ def main():
     # prompt the user for confirmation
     if not args['--force']:
 
-        # construct print-format to align output
         w = max([len(file) for file in args['<files>']])
-        fmt = 'mv {file:'+str(w)+'s} {new:s}'
+        fmt = 'mv {file:' + str(w) + 's} {new:s}'
+        for file, new in zip(args['<files>'], args['renamed']):
+            print(fmt.format(file=file, new=new))
 
-        # print all files
-        for file,new in zip(args['<files>'],args['renamed']):
-            print(fmt.format(file=file,new=new))
-
-        # quit if needed
         if args['--dry-run']:
             sys.exit(0)
 
-        # prompt user
         if not click.confirm('Proceed?'):
             sys.exit(1)
 
