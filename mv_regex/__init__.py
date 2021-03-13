@@ -1,85 +1,49 @@
-"""mv_regex
-  Rename files using regular expressions. The program will prompt the user for
-  confirmation before renaming (unless the "--force" options is used).
 
-Usage:
-  mv_regex [options] <search> <replace> <files>...
-
-Arguments:
-  <search>        Regular expression to search.
-  <replace>       Regular expression to use as replace.
-  <files>         List of files on which to do the replacement.
-
-Options:
-  -f, --force     Force move, don't prompt for user interaction.
-  -d, --dirname   Rename directory name (not the file-name).
-  -h, --help      Show help.
-      --version   Show version.
-
-
-Example:
-  mv_regex "(.*)(_raw.svg)" "\1.svg" *.svg
-
-Copyright:
-  T.W.J. de Geus
-  tom@geus.me
-  www.geus.me
-"""
-
-__version__ = '0.1.0'
-
-import sys
 import os
 import re
-import docopt
 import click
 
-# --------------------------------------------------------------------------------------------------
+from ._version import *
 
-def main():
+def mv(search, replace, files, force=False):
 
-  args = docopt.docopt(__doc__, version=__version__)
+    for file in files:
+        if not os.path.isfile(file) and not os.path.isdir(file):
+            raise IOError('Input {0:s} does not exist'.format(file))
 
-  # check if all input files actually exist
-  for file in args['<files>']:
-    if not os.path.isfile(file) and not os.path.isdir(file):
-      print('Input {0:s} does not exist'.format(file))
-      sys.exit(1)
+    # only keep input files that match the input regular-expression
+    files = [file for file in files if re.match(search, file)]
 
-  # select directory name
-  if args['--dirname']: args['<files>'] = [os.path.split(file)[0] for file in args['<files>']]
+    # rename the remaining files
+    ret = [re.sub(search, replace, file) for file in files]
 
-  # only keep input files that match the input regular-expression
-  args['<files>'] = [file for file in args['<files>'] if re.match(args['<search>'],file)]
+    # only keep files that will be renamed
+    idx = [i for i, (old, new) in enumerate(zip(files, ret)) if old != new]
+    files = [files[i] for i in idx]
+    renamed = [ret[i] for i in idx]
 
-  # rename the remaining files
-  args['renamed'] = [re.sub(args['<search>'],args['<replace>'],file) for file in args['<files>']]
+    # no files remaining -> quit
+    if len(renamed) == 0:
+        return ret
 
-  # only keep files that will be renamed
-  idx = [i for i,(old,new) in enumerate(zip(args['<files>'], args['renamed'])) if old != new]
-  args['<files>'] = [args['<files>'][i] for i in idx]
-  args['renamed'] = [args['renamed'][i] for i in idx]
+    # prompt the user for confirmation
+    if not force:
 
-  # no files remaining -> quit
-  if len(args['renamed']) == 0:
-    sys.exit(0)
+        # - construct print-format to align output
+        w = max([len(file) for file in files])
+        fmt = 'mv {file:'+str(w)+'s} {new:s}'
 
-  # prompt the user for confirmation
-  if not args['--force']:
+        # - print all files
+        for file,new in zip(files,renamed):
+            print(fmt.format(file=file,new=new))
 
-    # - construct print-format to align output
-    w   = max([len(file) for file in args['<files>']])
-    fmt = 'mv {file:'+str(w)+'s} {new:s}'
+        # - prompt user
+        if not click.confirm('Proceed?'):
+            raise IOError('Aborted')
 
-    # - print all files
-    for file,new in zip(args['<files>'],args['renamed']):
-      print(fmt.format(file=file,new=new))
+    # proceed with the renaming of all files
+    for file, new in zip(files,renamed):
+        os.rename(file, new)
 
-    # - prompt user
-    if not click.confirm('Proceed?'):
-      sys.exit(1)
-
-  # proceed with the renaming of all files
-  for file,new in zip(args['<files>'],args['renamed']):
-    os.rename(file,new)
+    return ret
 
