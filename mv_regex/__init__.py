@@ -1,4 +1,3 @@
-
 import os
 import re
 import click
@@ -46,4 +45,3 @@ def mv(search, replace, files, force=False):
         os.rename(file, new)
 
     return ret
-
