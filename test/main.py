@@ -21,7 +21,7 @@ class Test_cli_mv_regex(unittest.TestCase):
         with open('bar.log', 'w') as file:
             file.write('bar')
 
-        run(r'mv_regex -f "(.*)(\.log)" "\1\2.bak" *')
+        print(run(r'mv_regex -f "(.*)(\.log)" "\1\2.bak" *'))
 
         self.assertTrue(not os.path.isfile('foo.log'))
         self.assertTrue(not os.path.isfile('bar.log'))
