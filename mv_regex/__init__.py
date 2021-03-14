@@ -184,16 +184,21 @@ See http://stackoverflow.com/a/788780
     return ''.join(ret), ''.join(n_ret)
 
 
-def mv(search, replace, files, force=False, theme_name='none'):
+def mv(search, replace, files, force=False, quiet=False, theme_name='none'):
     r'''
 Rename files using a regular expression.
 
 :param str search: Regular expression to search.
 :param str replace: Regular expression to use as replace.
-:param str files: List of files on which to do the replacement.
-:param bool force: If set ``True`` renaming is applied without prompt.
+:param list files: List of files on which to do the replacement.
+:param bool force: If ``True`` apply without prompt. If ``None`` preform only dry run.
+:param bool quiet: If ``True`` the operation summary is suppressed.
 :param str theme_name: The name of the color-theme. See :py:mod:`mv_regex.theme`.
+:return: ``files`` after applying renaming.
     '''
+
+    if type(files) == str:
+        files = [files]
 
     color = theme(theme_name.lower())
 
@@ -217,28 +222,33 @@ Rename files using a regular expression.
         return ret
 
     # prompt the user for confirmation
-    if not force:
+    if force != True:
 
-        l = max([len(file) for file in files])
+        if not quiet:
 
-        for file, new in zip(files, renamed):
+            l = max([len(file) for file in files])
 
-            f, n = show_diff(file, new, theme_name.lower())
+            for file, new in zip(files, renamed):
 
-            if not os.path.isfile(new):
-                print('{0:s}{1:s} {2:s} {3:s}'.format(
-                    f,
-                    ' ' * (l - len(file)),
-                    String('->', color=color['new']).format(),
-                    n
-                ))
-            else:
-                print('{0:s}{1:s} {2:s} {3:s}'.format(
-                    f,
-                    ' ' * (l - len(file)),
-                    String('=>', color=color['overwrite']).format(),
-                    n
-                ))
+                f, n = show_diff(file, new, theme_name.lower())
+
+                if not os.path.isfile(new):
+                    print('{0:s}{1:s} {2:s} {3:s}'.format(
+                        f,
+                        ' ' * (l - len(file)),
+                        String('->', color=color['new']).format(),
+                        n
+                    ))
+                else:
+                    print('{0:s}{1:s} {2:s} {3:s}'.format(
+                        f,
+                        ' ' * (l - len(file)),
+                        String('=>', color=color['overwrite']).format(),
+                        n
+                    ))
+
+        if force is None:
+            return ret
 
         if not click.confirm('Proceed?'):
             raise IOError('Aborted')
