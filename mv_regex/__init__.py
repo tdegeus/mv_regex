@@ -1,91 +1,48 @@
-r"""mv_regex
-    Rename files using regular expressions. The program will prompt the user for
-    confirmation before renaming (unless the "--force" options is used).
 
-Usage:
-    mv_regex [options] <search> <replace> <files>...
-
-Arguments:
-    <search>        Regular expression to search.
-    <replace>       Regular expression to use as replace.
-    <files>         List of files on which to do the replacement.
-
-Options:
-    -f, --force     Force move, don't prompt for user interaction.
-    -n, --dry-run   Perform a trial run with no changes made.
-    -h, --help      Show help.
-        --version   Show version.
-
-Example:
-    mv_regex "(.*)(_raw.svg)" "\1.svg" *.svg
-
-(c - MIT) T.W.J. de Geus | tom@geus.me | www.geus.me | github.com/tdegeus/mv_regex
-"""
-
-__version__ = '0.2.0'
-
-import sys
 import os
 import re
-import docopt
 import click
 
-# --------------------------------------------------------------------------------------------------
+from ._version import *
 
-def main():
+def mv(search, replace, files, force=False):
 
-    args = docopt.docopt(__doc__, version=__version__)
-
-    # check that all input files exist
-    for file in args['<files>']:
+    for file in files:
         if not os.path.isfile(file) and not os.path.isdir(file):
-            print('Input {0:s} does not exist'.format(file))
-            sys.exit(1)
+            raise IOError('Input {0:s} does not exist'.format(file))
 
-    # only keep input files that match the input regular-expression (gains speed)
-    args['<files>'] = [file
-        for file in args['<files>'] if re.match(args['<search>'], file)]
+    # only keep input files that match the input regular-expression
+    files = [file for file in files if re.match(search, file)]
 
-    # rename files according to input
-    args['renamed'] = [re.sub(args['<search>'], args['<replace>'], file)
-        for file in args['<files>']]
+    # rename the remaining files
+    ret = [re.sub(search, replace, file) for file in files]
 
     # only keep files that will be renamed
-    idx = [i for i, (old, new) in enumerate(zip(args['<files>'], args['renamed'])) if old != new]
-    args['<files>'] = [args['<files>'][i] for i in idx]
-    args['renamed'] = [args['renamed'][i] for i in idx]
+    idx = [i for i, (old, new) in enumerate(zip(files, ret)) if old != new]
+    files = [files[i] for i in idx]
+    renamed = [ret[i] for i in idx]
 
     # no files remaining -> quit
-    if len(args['renamed']) == 0:
-        sys.exit(0)
-
-    # catch non-recursive limitation
-    for file in args['<files>']:
-        if os.path.isdir(file):
-            print('TODO: Current implementation non-recursive, please file a bug-report on GitHub')
-            sys.exit(1)
-
-    # avoid file overwrite
-    for file in args['renamed']:
-        if os.path.isdir(file):
-            print('Output "{0:s}" already exists, aborting"'.format(file))
-            sys.exit(1)
+    if len(renamed) == 0:
+        return ret
 
     # prompt the user for confirmation
-    if not args['--force']:
+    if not force:
 
-        w = max([len(file) for file in args['<files>']])
-        fmt = 'mv {file:' + str(w) + 's} {new:s}'
-        for file, new in zip(args['<files>'], args['renamed']):
-            print(fmt.format(file=file, new=new))
+        # - construct print-format to align output
+        w = max([len(file) for file in files])
+        fmt = 'mv {file:'+str(w)+'s} {new:s}'
 
-        if args['--dry-run']:
-            sys.exit(0)
+        # - print all files
+        for file,new in zip(files,renamed):
+            print(fmt.format(file=file,new=new))
 
+        # - prompt user
         if not click.confirm('Proceed?'):
-            sys.exit(1)
+            raise IOError('Aborted')
 
-    # rename files
-    for file, new in zip(args['<files>'], args['renamed']):
+    # proceed with the renaming of all files
+    for file, new in zip(files,renamed):
         os.rename(file, new)
 
+    return ret

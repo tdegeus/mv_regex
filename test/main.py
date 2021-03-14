@@ -1,22 +1,41 @@
-
+import unittest
 import subprocess
 import os
 
-# support function
-# ----------------
 
-def run(cmd):
-    subprocess.check_output(cmd,shell=True).decode('utf-8')
+def run(cmd, verbose=False):
+    try:
+        return subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
-# run test
-# --------
 
-open('test1_foo.log', 'w').write('foo')
-open('test1_bar.log', 'w').write('bar')
+class Test_cli_mv_regex(unittest.TestCase):
 
-run(r'mv_regex -f "(.*)(\.log)" "\1\2.bak" *')
+    def test_basic(self):
 
-assert not os.path.isfile('test1_foo.log')
-assert not os.path.isfile('test1_bar.log')
-assert os.path.isfile('test1_foo.log.bak')
-assert os.path.isfile('test1_bar.log.bak')
+        for file in ['foo.log', 'bar.log']:
+            if os.path.isfile(file):
+                os.remove(file)
+
+        with open('foo.log', 'w') as file:
+            file.write('foo')
+
+        with open('bar.log', 'w') as file:
+            file.write('bar')
+
+        run(r'mv_regex -f "(.*)(\.log)" "\1\2.bak" foo.log bar.log')
+
+        self.assertTrue(not os.path.isfile('foo.log'))
+        self.assertTrue(not os.path.isfile('bar.log'))
+        self.assertTrue(os.path.isfile('foo.log.bak'))
+        self.assertTrue(os.path.isfile('bar.log.bak'))
+
+        os.remove('foo.log.bak')
+        os.remove('bar.log.bak')
+
+
+if __name__ == '__main__':
+
+    unittest.main()
+
