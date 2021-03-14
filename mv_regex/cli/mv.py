@@ -23,6 +23,9 @@ The program will prompt the user for confirmation before renaming
     -f, --force
         Force move, don't prompt for user interaction.
 
+    -n, --dry-run
+        Perform a trial run with no changes made.
+
     --colors=arg
         Select color scheme from: none, dark. [default: dark]
 
@@ -53,6 +56,7 @@ def main():
 
         parser = Parser()
         parser.add_argument('-f', '--force', required=False, action='store_true')
+        parser.add_argument('-n', '--dry-run', required=False, action='store_true')
         parser.add_argument(      '--colors', required=False, default='dark')
         parser.add_argument('-v', '--version', action='version', version=version)
         parser.add_argument('search')
@@ -60,7 +64,12 @@ def main():
         parser.add_argument('files', nargs='+')
         args = parser.parse_args()
 
-        mv(args.search, args.replace, args.files, args.force, args.colors)
+        mv(
+            args.search,
+            args.replace,
+            args.files,
+            force = None if args.dry_run else args.force,
+            theme_name = args.colors)
 
     except Exception as e:
 

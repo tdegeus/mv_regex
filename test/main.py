@@ -15,7 +15,7 @@ class Test_cli_mv_regex(unittest.TestCase):
 
     def test_basic(self):
 
-        for file in ['foo.log', 'bar.log']:
+        for file in ['foo.log', 'bar.log', 'foo.log.bak', 'bar.log.bak']:
             if os.path.isfile(file):
                 os.remove(file)
 
@@ -34,6 +34,28 @@ class Test_cli_mv_regex(unittest.TestCase):
 
         os.remove('foo.log.bak')
         os.remove('bar.log.bak')
+
+    def test_dryrun(self):
+
+        for file in ['foo.log', 'bar.log', 'foo.log.bak', 'bar.log.bak']:
+            if os.path.isfile(file):
+                os.remove(file)
+
+        with open('foo.log', 'w') as file:
+            file.write('foo')
+
+        with open('bar.log', 'w') as file:
+            file.write('bar')
+
+        run(r'mv_regex -n "(.*)(\.log)" "\1\2.bak" foo.log bar.log')
+
+        self.assertTrue(os.path.isfile('foo.log'))
+        self.assertTrue(os.path.isfile('bar.log'))
+        self.assertTrue(not os.path.isfile('foo.log.bak'))
+        self.assertTrue(not os.path.isfile('bar.log.bak'))
+
+        os.remove('foo.log')
+        os.remove('bar.log')
 
     def test_indir(self):
 
