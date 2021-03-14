@@ -23,6 +23,9 @@ The program will prompt the user for confirmation before renaming
     -f, --force
         Force move, don't prompt for user interaction.
 
+    --colors=arg
+        Select color scheme from: none, dark. [default: dark]
+
     -h, --help
         Show help.
 
@@ -50,13 +53,14 @@ def main():
 
         parser = Parser()
         parser.add_argument('-f', '--force', required=False, action='store_true')
+        parser.add_argument(      '--colors', required=False, default='dark')
         parser.add_argument('-v', '--version', action='version', version=version)
         parser.add_argument('search')
         parser.add_argument('replace')
         parser.add_argument('files', nargs='+')
         args = parser.parse_args()
 
-        mv(args.search, args.replace, args.files, args.force)
+        mv(args.search, args.replace, args.files, args.force, args.colors)
 
     except Exception as e:
 
