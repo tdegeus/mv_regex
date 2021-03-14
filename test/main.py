@@ -4,7 +4,10 @@ import os
 
 
 def run(cmd, verbose=False):
-    return subprocess.check_output(cmd, shell=True).decode('utf-8')
+    try:
+        return subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
 
 class Test_cli_mv_regex(unittest.TestCase):
@@ -21,7 +24,7 @@ class Test_cli_mv_regex(unittest.TestCase):
         with open('bar.log', 'w') as file:
             file.write('bar')
 
-        print(run(r'mv_regex -f "(.*)(\.log)" "\1\2.bak" *'))
+        run(r'mv_regex -f "(.*)(\.log)" "\1\2.bak" *')
 
         self.assertTrue(not os.path.isfile('foo.log'))
         self.assertTrue(not os.path.isfile('bar.log'))
