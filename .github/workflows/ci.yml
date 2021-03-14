@@ -37,9 +37,11 @@ jobs:
 
     - name: Foo
       run: |
-        echo "foo" > foo.log
-        echo "bar" > bar.log
-        mv_regex -f "(.*)(\.log)" "\1\2.bak" *
+        echo "foo" > foo.txt
+        echo "bar" > bar.txt
+        ls
+        mv_regex -f "(.*)(\.txt)" "\1\2.bak" *
+        ls
 
     - name: Run tests
       run: python test/main.py
