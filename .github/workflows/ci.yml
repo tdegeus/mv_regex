@@ -32,6 +32,11 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Print Python version
+      run: |
+        python --version
+        python -m pip list
+
     - name: Install library
       run: python -m pip install .
 
